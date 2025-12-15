@@ -1,0 +1,13 @@
+---
+clean_mount_path: "/"
+clean_used_space_ratio_boundary: 0.9
+clean_directories: []
+clean_force: false
+
+clean_docker_restart: false
+clean_docker_prune_containers: true
+clean_docker_prune_images: true
+clean_docker_prune_images_filters_dangling: false
+clean_docker_prune_networks: true
+clean_docker_prune_volumes: true
+clean_docker_prune_builder_cache: true

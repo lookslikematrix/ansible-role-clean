@@ -1,0 +1,8 @@
+---
+galaxy_info:
+  author: lookslikematrix
+  description: clean up role
+
+  license: MIT
+
+  min_ansible_version: "2.18"

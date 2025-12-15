@@ -1,0 +1,25 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+    -   id: check-yaml
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+-   repo: https://github.com/streetsidesoftware/cspell-cli
+    rev: v9.3.3
+    hooks:
+    -   id: cspell
+        additional_dependencies:
+          - "@cspell/dict-de-de"
+        args:
+          - "lint"
+          - "--locale"
+          - "en,de"
+          - "--gitignore"
+-   repo: https://github.com/ansible/ansible-lint
+    rev: v25.12.1
+    hooks:
+    -   id: ansible-lint
+        args:
+        - "--exclude"
+        - ".pre-commit-config.yaml"

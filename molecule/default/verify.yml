@@ -1,0 +1,10 @@
+---
+- name: Verify
+  hosts: all
+  tasks:
+    - name: Assert directories are deleted
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: dir_stat
+      loop: "{{ clean_directories }}"
+      failed_when: dir_stat.stat.exists

@@ -1,0 +1,48 @@
+---
+- name: Collect facts about the mounts
+  ansible.builtin.setup:
+    gather_subset:
+      - mounts
+
+- name: Collect facts about services
+  ansible.builtin.service_facts:
+
+- name: Get primary mount
+  ansible.builtin.set_fact:
+    clean_mount: '{{ ansible_facts["mounts"] | selectattr("mount", "equalto", clean_mount_path) | first }}'
+
+- name: Get used space ratio
+  ansible.builtin.set_fact:
+    clean_used_space_ratio: '{{ 1 - clean_mount["size_available"] / clean_mount["size_total"] }}'
+
+- name: Check if clean is wanted
+  ansible.builtin.set_fact:
+    clean_enabled: "{{ clean_force or clean_used_space_ratio | float > clean_used_space_ratio_boundary }}"
+
+- name: Clean
+  when: clean_enabled
+  block:
+    - name: Check if docker is installed and clean it up
+      when: '"docker" in ansible_facts.services'
+      block:
+        - name: Restart docker
+          when: clean_docker_restart
+          ansible.builtin.systemd_service:
+            state: restarted
+            name: docker
+
+        - name: Prune everything
+          community.docker.docker_prune:
+            containers: "{{ clean_docker_prune_containers }}"
+            images: "{{ clean_docker_prune_images }}"
+            images_filters:
+              dangling: "{{ clean_docker_prune_images_filters_dangling }}"
+            networks: "{{ clean_docker_prune_networks }}"
+            volumes: "{{ clean_docker_prune_volumes }}"
+            builder_cache: "{{ clean_docker_prune_builder_cache }}"
+
+    - name: Clean directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop: "{{ clean_directories }}"
