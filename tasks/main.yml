@@ -15,8 +15,12 @@
   ansible.builtin.set_fact:
     clean_used_space_ratio: '{{ 1 - clean_mount["size_available"] / clean_mount["size_total"] }}'
 
+- name: Check if clean is wanted
+  ansible.builtin.set_fact:
+    clean_enabled: "{{ clean_force | bool or clean_used_space_ratio | float > clean_used_space_ratio_boundary }}"
+
 - name: Clean
-  when: clean_force or clean_used_space_ratio | float > clean_used_space_ratio_boundary
+  when: clean_enabled
   block:
     - name: Check if docker is installed and clean it up
       when: '"docker" in ansible_facts.services'
